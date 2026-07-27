@@ -2889,9 +2889,14 @@ function App() {
           <p className="mt-3 text-[0.56rem] font-black uppercase tracking-[0.18em] text-white/60 sm:mt-5 sm:text-[0.68rem] sm:tracking-[0.28em]">
             Desarrollado por
           </p>
-          <p className="mt-1 text-xs font-black uppercase tracking-[0.18em] text-white sm:mt-2 sm:text-sm sm:tracking-[0.25em]">
+          <a
+            className="mt-1 inline-block text-xs font-black uppercase tracking-[0.18em] text-white transition hover:text-[#d6a72b] sm:mt-2 sm:text-sm sm:tracking-[0.25em]"
+            href="https://porfolio-enzo-dalmasso.vercel.app/#projects"
+            rel="noreferrer"
+            target="_blank"
+          >
             Enzo Dalmasso
-          </p>
+          </a>
         </footer>
       </section>
     </main>

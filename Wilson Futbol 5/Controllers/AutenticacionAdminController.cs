@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Wilson_Futbol_5.Aplicacion.DTOs.AutenticacionAdmin;
 using Wilson_Futbol_5.Aplicacion.Interfaces;
 using Wilson_Futbol_5.Infraestructura.Seguridad;
@@ -19,6 +20,7 @@ public class AutenticacionAdminController : ControllerBase
     // Login del dueño. Si la contraseña es correcta, devuelve un token temporal.
     // Ese token se usa despues para llamar a los endpoints protegidos.
     [HttpPost("login")]
+    [EnableRateLimiting("AutenticacionAdmin")]
     public async Task<ActionResult<LoginAdminRespuestaDto>> IniciarSesion([FromBody] LoginAdminDto dto)
     {
         try
@@ -62,6 +64,7 @@ public class AutenticacionAdminController : ControllerBase
 
 
     [HttpPost("resetear-clave-soporte")]
+    [EnableRateLimiting("AutenticacionAdmin")]
     public async Task<ActionResult> ResetearClaveConSoporte([FromBody] ResetearClaveAdminSoporteDto dto)
     {
         try

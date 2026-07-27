@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.RateLimiting;
 using Wilson_Futbol_5.Aplicacion.Interfaces;
 using Wilson_Futbol_5.Aplicacion.Servicios;
 using Wilson_Futbol_5.Infraestructura.Persistencia;
@@ -17,11 +18,42 @@ namespace Wilson_Futbol_5
             builder.Services.Configure<ForwardedHeadersOptions>(opciones =>
             {
                 opciones.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                opciones.ForwardLimit = 1;
+                opciones.KnownIPNetworks.Clear();
                 opciones.KnownProxies.Clear();
             });
 
             // Add services to the container.
             builder.Services.AddControllers();
+
+            // Limitamos intentos sobre endpoints sensibles.
+            // Esto ayuda contra fuerza bruta en login/reset y contra spam de reservas publicas.
+            builder.Services.AddRateLimiter(opciones =>
+            {
+                opciones.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                opciones.AddPolicy("AutenticacionAdmin", contexto =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        ObtenerClaveIp(contexto),
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            AutoReplenishment = true,
+                            PermitLimit = 5,
+                            QueueLimit = 0,
+                            Window = TimeSpan.FromMinutes(1)
+                        }));
+
+                opciones.AddPolicy("ReservasPublicas", contexto =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        ObtenerClaveIp(contexto),
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            AutoReplenishment = true,
+                            PermitLimit = 30,
+                            QueueLimit = 0,
+                            Window = TimeSpan.FromMinutes(1)
+                        }));
+            });
 
             builder.Services.AddScoped<IServicioTurnos, ServicioTurnos>();
             builder.Services.AddScoped<IServicioTurnosFijos, ServicioTurnosFijos>();
@@ -50,9 +82,6 @@ namespace Wilson_Futbol_5
                 });
             });
 
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
-
             // Leemos la cadena de conexion que usara EF Core para conectarse a PostgreSQL/Supabase.
             var cadenaConexion = builder.Configuration.GetConnectionString("WilsonDb");
 
@@ -67,17 +96,28 @@ namespace Wilson_Futbol_5
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            app.UseForwardedHeaders();
+
+            if (!app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.UseHsts();
             }
 
-            app.UseForwardedHeaders();
+            app.Use(async (contexto, siguiente) =>
+            {
+                contexto.Response.Headers.TryAdd("X-Content-Type-Options", "nosniff");
+                contexto.Response.Headers.TryAdd("X-Frame-Options", "DENY");
+                contexto.Response.Headers.TryAdd("Referrer-Policy", "no-referrer");
+                contexto.Response.Headers.TryAdd("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+
+                await siguiente();
+            });
 
             app.UseHttpsRedirection();
 
             app.UseCors("FrontendLocal");
+
+            app.UseRateLimiter();
 
             app.UseAuthorization();
 
@@ -85,6 +125,11 @@ namespace Wilson_Futbol_5
             app.MapControllers();
 
             app.Run();
+        }
+
+        private static string ObtenerClaveIp(HttpContext contexto)
+        {
+            return contexto.Connection.RemoteIpAddress?.ToString() ?? "ip-desconocida";
         }
     }
 }

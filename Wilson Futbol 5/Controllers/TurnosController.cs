@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Wilson_Futbol_5.Aplicacion.DTOs.Turnos;
 using Wilson_Futbol_5.Aplicacion.Interfaces;
 using Wilson_Futbol_5.Infraestructura.Seguridad;
@@ -22,6 +23,7 @@ public class TurnosController : ControllerBase
     // Ejemplo de uso:
     // GET /api/turnos/disponibilidad?fecha=2026-07-15
     [HttpGet("disponibilidad")]
+    [EnableRateLimiting("ReservasPublicas")]
     public async Task<ActionResult<DisponibilidadTurnosDto>> ObtenerDisponibilidad(
         [FromQuery] DateOnly fecha)
     {
@@ -78,6 +80,7 @@ public class TurnosController : ControllerBase
     // Ejemplo de uso:
     // POST /api/turnos/reservar
     [HttpPost("reservar")]
+    [EnableRateLimiting("ReservasPublicas")]
     public async Task<ActionResult<TurnoReservadoDto>> ReservarTurno([FromBody] ReservarTurnoDto dto)
     {
         try
@@ -203,6 +206,7 @@ public class TurnosController : ControllerBase
     // Ejemplo de uso:
     // POST /api/turnos/cancelar/d70a96a58f5a4d1481d2622d687e9658
     [HttpPost("cancelar/{tokenCancelacion}")]
+    [EnableRateLimiting("ReservasPublicas")]
     public async Task<ActionResult<TurnoCanceladoDto>> CancelarTurno(string tokenCancelacion)
     {
         try
@@ -224,3 +228,4 @@ public class TurnosController : ControllerBase
         }
     }
 }
+

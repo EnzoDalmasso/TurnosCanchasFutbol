@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Wilson_Futbol_5.Aplicacion.DTOs.AutenticacionAdmin;
@@ -15,6 +15,8 @@ public class ServicioAutenticacionAdmin : IServicioAutenticacionAdmin
     private const int CantidadBytesSalt = 16;
     private const int IteracionesHash = 100_000;
     private const int HorasDuracionSesion = 12;
+    private const int LongitudMinimaClaveAdmin = 12;
+    private const int LongitudMinimaClaveSoporte = 16;
 
     private readonly IConfiguration _configuracion;
     private readonly WilsonDbContext _contexto;
@@ -40,6 +42,11 @@ public class ServicioAutenticacionAdmin : IServicioAutenticacionAdmin
         {
             throw new InvalidOperationException(
                 "Falta configurar SeguridadAdmin:ClaveInicial para crear el primer acceso del dueño.");
+        }
+
+        if (claveInicial.Length < LongitudMinimaClaveAdmin)
+        {
+            throw new InvalidOperationException("La contraseña inicial del dueño debe tener al menos 12 caracteres.");
         }
 
         var salt = GenerarSalt();
@@ -98,9 +105,9 @@ public class ServicioAutenticacionAdmin : IServicioAutenticacionAdmin
             throw new InvalidOperationException("Tenes que ingresar la contraseña actual.");
         }
 
-        if (string.IsNullOrWhiteSpace(dto.ClaveNueva) || dto.ClaveNueva.Length < 8)
+        if (string.IsNullOrWhiteSpace(dto.ClaveNueva) || dto.ClaveNueva.Length < LongitudMinimaClaveAdmin)
         {
-            throw new InvalidOperationException("La contraseña nueva debe tener al menos 8 caracteres.");
+            throw new InvalidOperationException("La contraseña nueva debe tener al menos 12 caracteres.");
         }
 
         var credencial = await ObtenerCredencialAdminAsync();
@@ -134,14 +141,19 @@ public class ServicioAutenticacionAdmin : IServicioAutenticacionAdmin
             throw new InvalidOperationException("La clave de soporte no esta configurada.");
         }
 
-        if (dto.ClaveSoporte != claveSoporteConfigurada)
+        if (claveSoporteConfigurada.Length < LongitudMinimaClaveSoporte)
+        {
+            throw new InvalidOperationException("La clave de soporte debe tener al menos 16 caracteres.");
+        }
+
+        if (!TextoSeguroIgual(dto.ClaveSoporte, claveSoporteConfigurada))
         {
             throw new InvalidOperationException("La clave de soporte no es correcta.");
         }
 
-        if (string.IsNullOrWhiteSpace(dto.ClaveNueva) || dto.ClaveNueva.Length < 8)
+        if (string.IsNullOrWhiteSpace(dto.ClaveNueva) || dto.ClaveNueva.Length < LongitudMinimaClaveAdmin)
         {
-            throw new InvalidOperationException("La contraseña nueva debe tener al menos 8 caracteres.");
+            throw new InvalidOperationException("La contraseña nueva debe tener al menos 12 caracteres.");
         }
 
         var credencial = await ObtenerCredencialAdminAsync();
@@ -201,6 +213,14 @@ public class ServicioAutenticacionAdmin : IServicioAutenticacionAdmin
             Convert.FromBase64String(credencial.HashClave));
     }
 
+    private static bool TextoSeguroIgual(string valorIngresado, string valorConfigurado)
+    {
+        var bytesValorIngresado = Encoding.UTF8.GetBytes(valorIngresado ?? string.Empty);
+        var bytesValorConfigurado = Encoding.UTF8.GetBytes(valorConfigurado);
+
+        return CryptographicOperations.FixedTimeEquals(bytesValorIngresado, bytesValorConfigurado);
+    }
+
     private static string GenerarSalt()
     {
         return Convert.ToBase64String(RandomNumberGenerator.GetBytes(CantidadBytesSalt));
@@ -231,3 +251,4 @@ public class ServicioAutenticacionAdmin : IServicioAutenticacionAdmin
         return Convert.ToHexString(SHA256.HashData(bytesToken));
     }
 }
+

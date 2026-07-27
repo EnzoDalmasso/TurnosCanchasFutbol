@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import logoWilson from './assets/LogoWilson.png'
+import logoFutbol from './assets/LogoFutbol.png'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://localhost:7094/api'
 const SESSION_TOKEN_DUENO_KEY = 'wilson_token_dueno'
+const NOMBRE_APP = 'Turnos Canchas de Futbol'
 
 const datosReservaIniciales = {
   apellido: '',
@@ -536,7 +537,7 @@ function App() {
 
     if (tipoMensaje === 'sena') {
       return [
-        `Hola ${turno.nombreCliente}, te escribimos de Wilson Futbol 5 por tu reserva del ${fecha} de ${horaInicio} a ${horaFin}.`,
+        `Hola ${turno.nombreCliente}, te escribimos de ${NOMBRE_APP} por tu reserva del ${fecha} de ${horaInicio} a ${horaFin}.`,
         `Para dejarla pendiente de confirmacion, podes enviar una seña de ${montoSena}.`,
         datosTransferencia.length > 0 ? datosTransferencia.join(' - ') : '',
         'Cuando hagas la transferencia, mandanos el comprobante por este chat.',
@@ -545,15 +546,15 @@ function App() {
 
     if (tipoMensaje === 'confirmacion') {
       return [
-        `Hola ${turno.nombreCliente}, tu turno en Wilson Futbol 5 queda confirmado para el ${fecha} de ${horaInicio} a ${horaFin}.`,
+        `Hola ${turno.nombreCliente}, tu turno en ${NOMBRE_APP} queda confirmado para el ${fecha} de ${horaInicio} a ${horaFin}.`,
         `Total de la cancha: ${precioTotal}.`,
         'Te esperamos.',
       ].join('\n')
     }
 
     return [
-      `Hola ${turno.nombreCliente}, te escribimos de Wilson Futbol 5 por tu solicitud del ${fecha} de ${horaInicio} a ${horaFin}.`,
-      'No se pudo confirmar el turno, lo sentimos. Wilson Futbol 5',
+      `Hola ${turno.nombreCliente}, te escribimos de ${NOMBRE_APP} por tu solicitud del ${fecha} de ${horaInicio} a ${horaFin}.`,
+      `No se pudo confirmar el turno, lo sentimos. ${NOMBRE_APP}`,
     ].join('\n')
   }
 
@@ -1184,13 +1185,13 @@ function App() {
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-4">
               <img
-                alt="Wilson Futbol 5"
+                alt={NOMBRE_APP}
                 className="h-20 w-20 rounded-full border-2 border-[#d6a72b] bg-white object-contain p-1"
-                src={logoWilson}
+                src={logoFutbol}
               />
               <div>
                 <p className="text-sm font-bold uppercase text-[#d6a72b]">
-                  Wilson Futbol 5
+                  {NOMBRE_APP}
                 </p>
                 <h1 className="mt-1 text-3xl font-black text-white sm:text-4xl">
                   {esRutaAdmin ? 'Panel del dueño' : 'Reserva tu cancha'}
@@ -2883,7 +2884,7 @@ function App() {
         )}
         <footer className="mt-8 border-t border-white/10 py-6 text-left">
           <p className="text-[0.56rem] font-black uppercase tracking-[0.18em] text-white/60 sm:text-[0.68rem] sm:tracking-[0.28em]">
-            © 2026 Wilson Futbol 5. Todos los derechos reservados.
+            © 2026 {NOMBRE_APP}. Todos los derechos reservados.
           </p>
           <p className="mt-3 text-[0.56rem] font-black uppercase tracking-[0.18em] text-white/60 sm:mt-5 sm:text-[0.68rem] sm:tracking-[0.28em]">
             Desarrollado por

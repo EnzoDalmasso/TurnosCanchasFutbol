@@ -257,10 +257,20 @@ public class ServicioTurnos : IServicioTurnos
                     fechaHoraFin > inicioTurnoFijo;
             });
 
-            var estaOcupado = turnoQueBloquea is not null || turnoFijoQueBloquea is not null;
+            // Si el horario ya empezo o ya paso, no debe quedar reservable.
+            // Ejemplo: si son 20:53, los bloques 18-19, 19-20 y 20-21 quedan bloqueados.
+            var horarioYaPaso = fechaHoraInicio <= fechaActual;
+
+            var estaOcupado = horarioYaPaso || turnoQueBloquea is not null || turnoFijoQueBloquea is not null;
 
             var estado = "Disponible";
             var textoEstado = "Disponible";
+
+            if (horarioYaPaso)
+            {
+                estado = "HorarioPasado";
+                textoEstado = "Horario pasado";
+            }
 
             if (turnoQueBloquea?.EstadoTurno == EstadoTurno.EnEsperaDePago)
             {

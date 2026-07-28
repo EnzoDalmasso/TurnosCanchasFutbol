@@ -331,6 +331,7 @@ public class WilsonDbContext : DbContext
             ValorMultaInasistencia = 0,
             MinutosEsperaReserva = 30,
             MontoSena = 25000,
+            CobraReservaPorTransferencia = true,
             AliasTransferencia = "wilson.futbol5",
             NombreTitularTransferencia = "Wilson Futbol 5",
             MensajePagoReserva = "Para confirmar la reserva, transferi la seña y envia el comprobante al dueño.",

@@ -13,6 +13,8 @@ public class ConfiguracionNegocioDto
 
     public decimal MontoSena { get; set; }
 
+    public bool CobraReservaPorTransferencia { get; set; }
+
     public string AliasTransferencia { get; set; } = string.Empty;
 
     public string NombreTitularTransferencia { get; set; } = string.Empty;

@@ -14,6 +14,8 @@ public class ActualizarConfiguracionNegocioDto
     [Range(0, 999999999)]
     public decimal MontoSena { get; set; }
 
+    public bool CobraReservaPorTransferencia { get; set; } = true;
+
     [MaxLength(100)]
     public string AliasTransferencia { get; set; } = string.Empty;
 

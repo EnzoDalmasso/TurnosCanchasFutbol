@@ -23,6 +23,8 @@ public class TurnoReservadoDto
 
     public decimal MontoSena { get; set; }
 
+    public bool CobraReservaPorTransferencia { get; set; }
+
     public DateTime? FechaVencimientoReserva { get; set; }
 
     public string EstadoTurno { get; set; } = string.Empty;

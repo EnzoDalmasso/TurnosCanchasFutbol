@@ -50,6 +50,7 @@ public class ServicioConfiguracionNegocio : IServicioConfiguracionNegocio
         configuracion.PrecioPorPersona = dto.PrecioPorPersona;
         configuracion.CantidadJugadoresPorTurno = dto.CantidadJugadoresPorTurno;
         configuracion.MontoSena = dto.MontoSena;
+        configuracion.CobraReservaPorTransferencia = dto.CobraReservaPorTransferencia;
         configuracion.AliasTransferencia = dto.AliasTransferencia.Trim();
         configuracion.NombreTitularTransferencia = dto.NombreTitularTransferencia.Trim();
         configuracion.MensajePagoReserva = dto.MensajePagoReserva.Trim();
@@ -71,6 +72,7 @@ public class ServicioConfiguracionNegocio : IServicioConfiguracionNegocio
             CantidadJugadoresPorTurno = configuracion.CantidadJugadoresPorTurno,
             PrecioTotalTurno = precioTotalTurno,
             MontoSena = configuracion.MontoSena,
+            CobraReservaPorTransferencia = configuracion.CobraReservaPorTransferencia,
             AliasTransferencia = configuracion.AliasTransferencia,
             NombreTitularTransferencia = configuracion.NombreTitularTransferencia,
             MensajePagoReserva = configuracion.MensajePagoReserva

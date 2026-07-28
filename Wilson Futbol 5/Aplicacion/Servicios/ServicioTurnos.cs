@@ -225,6 +225,9 @@ public class ServicioTurnos : IServicioTurnos
         // El precio total se calcula como precio por persona multiplicado por la cantidad de jugadores.
         // En futbol 5 son 10 jugadores, pero tambien queda parametrizado en configuracion.
         var precioTotal = configuracion.PrecioPorPersona * configuracion.CantidadJugadoresPorTurno;
+        var montoSena = configuracion.CobraReservaPorTransferencia
+            ? configuracion.MontoSena
+            : 0;
 
         // Aca vamos a ir armando la lista final que va a recibir el frontend.
         var horariosDisponibles = new List<TurnoDisponibleDto>();
@@ -299,7 +302,7 @@ public class ServicioTurnos : IServicioTurnos
                 Disponible = !estaOcupado,
                 Estado = estado,
                 TextoEstado = textoEstado,
-                MontoSena = configuracion.MontoSena,
+                MontoSena = montoSena,
                 PrecioPorPersona = configuracion.PrecioPorPersona,
                 PrecioTotal = precioTotal
             });
@@ -471,6 +474,9 @@ public class ServicioTurnos : IServicioTurnos
         // Calculamos el precio total congelado al momento de reservar.
         // Si el dueno cambia el precio despues, este turno mantiene el valor original.
         var precioTotal = configuracion.PrecioPorPersona * configuracion.CantidadJugadoresPorTurno;
+        var montoSena = configuracion.CobraReservaPorTransferencia
+            ? configuracion.MontoSena
+            : 0;
 
         // Creamos el cliente con los datos recibidos desde el formulario.
         // Mas adelante podemos mejorar esto para reutilizar clientes por telefono.
@@ -492,7 +498,7 @@ public class ServicioTurnos : IServicioTurnos
             PrecioPorPersonaAlReservar = configuracion.PrecioPorPersona,
             CantidadJugadores = configuracion.CantidadJugadoresPorTurno,
             PrecioTotal = precioTotal,
-            MontoSena = configuracion.MontoSena,
+            MontoSena = montoSena,
             FechaVencimientoReserva = null
         };
 
@@ -528,6 +534,7 @@ public class ServicioTurnos : IServicioTurnos
             FechaHoraFin = turno.FechaHoraFin,
             PrecioTotal = turno.PrecioTotal,
             MontoSena = turno.MontoSena,
+            CobraReservaPorTransferencia = configuracion.CobraReservaPorTransferencia,
             FechaVencimientoReserva = turno.FechaVencimientoReserva,
             EstadoTurno = turno.EstadoTurno.ToString(),
             TextoEstado = "Pendiente del dueño",
@@ -761,6 +768,9 @@ public class ServicioTurnos : IServicioTurnos
 
         var duracionHoras = (decimal)(dto.FechaHoraFin - dto.FechaHoraInicio).TotalHours;
         var precioTotal = configuracion.PrecioPorPersona * configuracion.CantidadJugadoresPorTurno * duracionHoras;
+        var montoSena = configuracion.CobraReservaPorTransferencia
+            ? configuracion.MontoSena
+            : 0;
 
         var turno = new Turno
         {
@@ -773,7 +783,7 @@ public class ServicioTurnos : IServicioTurnos
             PrecioPorPersonaAlReservar = configuracion.PrecioPorPersona,
             CantidadJugadores = configuracion.CantidadJugadoresPorTurno,
             PrecioTotal = precioTotal,
-            MontoSena = configuracion.MontoSena,
+            MontoSena = montoSena,
             FechaVencimientoReserva = null,
             FechaConfirmacion = RelojNegocio.AhoraArgentina(),
             MotivoCancelacion = dto.Observacion?.Trim()
@@ -792,6 +802,7 @@ public class ServicioTurnos : IServicioTurnos
             FechaHoraFin = turno.FechaHoraFin,
             PrecioTotal = turno.PrecioTotal,
             MontoSena = turno.MontoSena,
+            CobraReservaPorTransferencia = configuracion.CobraReservaPorTransferencia,
             FechaVencimientoReserva = turno.FechaVencimientoReserva,
             EstadoTurno = turno.EstadoTurno.ToString(),
             TextoEstado = "Reserva especial",

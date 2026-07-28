@@ -375,7 +375,7 @@ X-Admin-Token: {{AdminToken}}
 ###
 
 # Actualizar configuracion del negocio.
-# Cambia precio por persona, cantidad de jugadores, seña y datos de transferencia.
+# Cambia precio por persona, cantidad de jugadores, seña, si cobra por transferencia y datos de pago.
 PUT {{Wilson_Futbol_5_HostAddress}}/api/configuracion-negocio
 Content-Type: application/json
 X-Admin-Token: {{AdminToken}}
@@ -384,6 +384,7 @@ X-Admin-Token: {{AdminToken}}
   "precioPorPersona": 6000,
   "cantidadJugadoresPorTurno": 10,
   "montoSena": 30000,
+  "cobraReservaPorTransferencia": true,
   "aliasTransferencia": "wilson.futbol5",
   "nombreTitularTransferencia": "Wilson Futbol 5",
   "mensajePagoReserva": "Para confirmar la reserva, transferi la seña y envia el comprobante al dueño."

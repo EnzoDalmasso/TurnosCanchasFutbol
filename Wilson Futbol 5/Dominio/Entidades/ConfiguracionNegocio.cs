@@ -27,6 +27,9 @@ public class ConfiguracionNegocio
     // Monto que el dueño solicita como seña para confirmar la reserva.
     public decimal MontoSena { get; set; } = 25000;
 
+    // Permite activar o desactivar si el cliente debe ver datos para transferir una seña.
+    public bool CobraReservaPorTransferencia { get; set; } = true;
+
     // Alias o CVU donde el cliente debe transferir la sena.
     public string AliasTransferencia { get; set; } = string.Empty;
 

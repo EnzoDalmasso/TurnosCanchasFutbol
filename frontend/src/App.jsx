@@ -534,8 +534,18 @@ function App() {
       alias ? `Alias: ${alias}` : '',
       titular ? `Titular: ${titular}` : '',
     ].filter(Boolean)
+    const cobraReservaPorTransferencia = Boolean(
+      configuracionNegocio?.cobraReservaPorTransferencia,
+    )
 
     if (tipoMensaje === 'sena') {
+      if (!cobraReservaPorTransferencia) {
+        return [
+          `Hola ${turno.nombreCliente}, te escribimos de ${NOMBRE_APP} por tu reserva del ${fecha} de ${horaInicio} a ${horaFin}.`,
+          'La reserva queda pendiente de confirmacion del dueño.',
+        ].join('\n')
+      }
+
       return [
         `Hola ${turno.nombreCliente}, te escribimos de ${NOMBRE_APP} por tu reserva del ${fecha} de ${horaInicio} a ${horaFin}.`,
         `Para dejarla pendiente de confirmacion, podes enviar una seña de ${montoSena}.`,
@@ -694,11 +704,11 @@ function App() {
   }
 
   function cambiarDatoConfiguracionNegocio(evento) {
-    const { name, value } = evento.target
+    const { checked, name, type, value } = evento.target
 
     setConfiguracionNegocio((configuracionActual) => ({
       ...configuracionActual,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     }))
   }
 
@@ -1010,6 +1020,7 @@ function App() {
           precioPorPersona: Number(configuracionNegocio.precioPorPersona),
           cantidadJugadoresPorTurno: Number(configuracionNegocio.cantidadJugadoresPorTurno),
           montoSena: Number(configuracionNegocio.montoSena),
+          cobraReservaPorTransferencia: Boolean(configuracionNegocio.cobraReservaPorTransferencia),
           aliasTransferencia: configuracionNegocio.aliasTransferencia,
           nombreTitularTransferencia: configuracionNegocio.nombreTitularTransferencia,
           mensajePagoReserva: configuracionNegocio.mensajePagoReserva,
@@ -1400,12 +1411,15 @@ function App() {
                       <dt className="font-bold text-[#0b2f63]">Teléfono</dt>
                       <dd>{turnoConfirmado.telefonoCliente}</dd>
                     </div>
-                    <div>
-                      <dt className="font-bold text-[#0b2f63]">Monto sugerido</dt>
-                      <dd>{formatearPrecio(turnoConfirmado.montoSena)}</dd>
-                    </div>
+                    {turnoConfirmado.cobraReservaPorTransferencia && (
+                      <div>
+                        <dt className="font-bold text-[#0b2f63]">Monto sugerido</dt>
+                        <dd>{formatearPrecio(turnoConfirmado.montoSena)}</dd>
+                      </div>
+                    )}
                   </dl>
 
+                  {turnoConfirmado.cobraReservaPorTransferencia && (
                   <div className="mt-4 rounded-xl border border-[#d6a72b]/60 bg-[#fff8e7] p-3">
                     <p className="text-sm font-black uppercase text-[#0b2f63]">
                       Datos para transferir
@@ -1433,6 +1447,7 @@ function App() {
                       )}
                     </dl>
                   </div>
+                  )}
 
                   <button
                     className="mt-4 w-full rounded-xl border border-[#0b2f63] bg-white px-4 py-2 text-sm font-black text-[#0b2f63] transition hover:bg-[#edf3ff]"
@@ -1883,6 +1898,28 @@ function App() {
               className="mt-5 rounded-2xl border border-[#d6dce5] bg-[#f8fafc] p-4"
               onSubmit={guardarConfiguracionNegocio}
             >
+              <label
+                className="mb-4 flex cursor-pointer flex-col gap-3 rounded-xl border border-[#d6dce5] bg-white p-3 sm:flex-row sm:items-center sm:justify-between"
+                htmlFor="cobraReservaPorTransferencia"
+              >
+                <span>
+                  <span className="block text-sm font-black text-[#0b2f63]">
+                    Cobrar reserva por transferencia
+                  </span>
+                  <span className="mt-1 block text-sm font-semibold text-[#566273]">
+                    Si esta apagado, el cliente no ve alias, seña ni datos para transferir.
+                  </span>
+                </span>
+                <input
+                  checked={Boolean(configuracionNegocio.cobraReservaPorTransferencia)}
+                  className="h-6 w-6 accent-[#0b2f63]"
+                  id="cobraReservaPorTransferencia"
+                  name="cobraReservaPorTransferencia"
+                  onChange={cambiarDatoConfiguracionNegocio}
+                  type="checkbox"
+                />
+              </label>
+
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
                 <div>
                   <label className="text-sm font-bold text-[#0b2f63]" htmlFor="precioPorPersona">
@@ -1922,6 +1959,7 @@ function App() {
                   </label>
                   <input
                     className="mt-1 w-full rounded-xl border border-[#d6dce5] bg-white px-3 py-2 text-sm outline-none focus:border-[#d6a72b]"
+                    disabled={!configuracionNegocio.cobraReservaPorTransferencia}
                     id="montoSena"
                     min="0"
                     name="montoSena"
@@ -1950,6 +1988,7 @@ function App() {
                   </label>
                   <input
                     className="mt-1 w-full rounded-xl border border-[#d6dce5] bg-white px-3 py-2 text-sm outline-none focus:border-[#d6a72b]"
+                    disabled={!configuracionNegocio.cobraReservaPorTransferencia}
                     id="aliasTransferencia"
                     maxLength={100}
                     name="aliasTransferencia"
@@ -1965,6 +2004,7 @@ function App() {
                   </label>
                   <input
                     className="mt-1 w-full rounded-xl border border-[#d6dce5] bg-white px-3 py-2 text-sm outline-none focus:border-[#d6a72b]"
+                    disabled={!configuracionNegocio.cobraReservaPorTransferencia}
                     id="nombreTitularTransferencia"
                     maxLength={120}
                     name="nombreTitularTransferencia"
@@ -1981,6 +2021,7 @@ function App() {
                 </label>
                 <textarea
                   className="mt-1 min-h-20 w-full rounded-xl border border-[#d6dce5] bg-white px-3 py-2 text-sm outline-none focus:border-[#d6a72b]"
+                  disabled={!configuracionNegocio.cobraReservaPorTransferencia}
                   id="mensajePagoReserva"
                   maxLength={300}
                   name="mensajePagoReserva"
@@ -2078,10 +2119,12 @@ function App() {
                         {formatearHora(turno.fechaHoraFin)}
                       </dd>
                     </div>
-                    <div>
-                      <dt className="font-bold text-[#0b2f63]">Monto sugerido</dt>
-                      <dd>{formatearPrecio(turno.montoSena)}</dd>
-                    </div>
+                    {configuracionNegocio?.cobraReservaPorTransferencia && (
+                      <div>
+                        <dt className="font-bold text-[#0b2f63]">Monto sugerido</dt>
+                        <dd>{formatearPrecio(turno.montoSena)}</dd>
+                      </div>
+                    )}
                     <div>
                       <dt className="font-bold text-[#0b2f63]">Total</dt>
                       <dd>{formatearPrecio(turno.precioTotal)}</dd>
@@ -2093,14 +2136,16 @@ function App() {
                       WhatsApp manual
                     </p>
                     <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                      <a
-                        className="rounded-xl border border-[#1e6b35] bg-[#f0fff4] px-3 py-2 text-center text-sm font-black text-[#1e6b35] transition hover:bg-[#d7f8df]"
-                        href={crearLinkWhatsAppPendiente(turno, 'sena')}
-                        rel="noreferrer"
-                        target="_blank"
-                      >
-                        Pedir seña
-                      </a>
+                      {configuracionNegocio?.cobraReservaPorTransferencia && (
+                        <a
+                          className="rounded-xl border border-[#1e6b35] bg-[#f0fff4] px-3 py-2 text-center text-sm font-black text-[#1e6b35] transition hover:bg-[#d7f8df]"
+                          href={crearLinkWhatsAppPendiente(turno, 'sena')}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          Pedir seña
+                        </a>
+                      )}
                       <a
                         className="rounded-xl border border-[#0b2f63] bg-[#edf3ff] px-3 py-2 text-center text-sm font-black text-[#0b2f63] transition hover:bg-[#dbe8ff]"
                         href={crearLinkWhatsAppPendiente(turno, 'confirmacion')}

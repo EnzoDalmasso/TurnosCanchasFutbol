@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import logoFutbol from './assets/LogoFutbol.png'
+import videoReservaCancha from './assets/ReservaTuCancha.mp4'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://localhost:7094/api'
 const SESSION_TOKEN_DUENO_KEY = 'wilson_token_dueno'
@@ -1307,6 +1308,19 @@ function App() {
           </div>
           )}
         </header>
+
+        {!esRutaAdmin && (
+          <section className="overflow-hidden rounded-[28px] border border-[#d6a72b]/35 bg-[#071f43] p-2 shadow-2xl shadow-black/25">
+            <video
+              aria-label="Video de reserva de cancha"
+              className="max-h-[620px] w-full rounded-[22px] bg-black object-contain"
+              controls
+              playsInline
+              preload="metadata"
+              src={videoReservaCancha}
+            />
+          </section>
+        )}
 
         {!esRutaAdmin && (
         <section className="grid gap-5 lg:grid-cols-[380px_1fr]">

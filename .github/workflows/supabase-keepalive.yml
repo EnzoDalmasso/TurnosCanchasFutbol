@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: "0 12 * * 1,4"
   workflow_dispatch:
+  # Corre tambien cuando se modifica este archivo, para verificarlo sin pasos manuales.
+  push:
+    branches: [main]
+    paths: [.github/workflows/supabase-keepalive.yml]
 
 permissions:
   actions: write
